@@ -1,4 +1,6 @@
+package framework;
 
+import framework.recommend.Recommend;
 
 public class TestRec implements Recommend {
 
