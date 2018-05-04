@@ -1,6 +1,7 @@
-package framework;
+package test.java;
 
-import framework.recommend.Recommend;
+
+import main.java.recommend.Recommend;;
 
 public class TestRec implements Recommend {
 

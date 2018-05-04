@@ -1,4 +1,4 @@
-package framework.evaluate;
+package main.java.evaluate;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,7 +15,7 @@ public class Evaluate {
         FileWriter writeScore = new FileWriter(score);
         for(int i = 0;i < this.metrics.size(); i ++) {
             this.metrics.get(i).run(recommend, partition);
-             // Escrever o retorno da função eval no arquivo
+            // Escrever o retorno da função eval no arquivo
         }
     }
 }
