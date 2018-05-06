@@ -23,24 +23,61 @@ public class Partition {
         return articles;
     }
 
-    public void setArticles(File articles) {
-        this.articles = articles;
+    public void setArticles(String articles) {
+        try {
+            FileWriter fileWriter = new FileWriter(this.articles,true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            System.out.println("Escreveu");
+            bufferedWriter.write(articles+"\n");
+            // bufferedWriter.append(logs+"\n");
+            bufferedWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public File getSession() {
         return session;
     }
 
-    public void setSession(File session) {
-        this.session = session;
+    public void setSession(String logs) {
+        try {
+            String[] args = logs.split(";");
+            String out = args[0];
+            for(int i = 2; i < args.length; i +=4){
+                out += ";"+ args[i]+";"+args[i+1];
+            }
+            FileWriter fileWriter = new FileWriter(this.session,true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            System.out.println("Escreveu");
+            bufferedWriter.write(out+"\n");
+            // bufferedWriter.append(logs+"\n");
+            bufferedWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public File getRecommendation() {
         return recommendation;
     }
 
-    public void setRecomendation(File recommendation) {
-        this.recommendation = recommendation;
+    public void setRecommendation(String recommendation) {
+        try {
+            String[] args = recommendation.split(";");
+            String out = "";
+            for(int i = 5; i < args.length; i += 4)
+                out += args[i]+";";
+
+            FileWriter fileWriter = new FileWriter(this.recommendation,true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            System.out.println("Escreveu");
+            bufferedWriter.write(recommendation+"\n");
+            // bufferedWriter.append(logs+"\n");
+            bufferedWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Integer getId() {
@@ -52,16 +89,16 @@ public class Partition {
         this.id = id;
     }
 
-    public void updatePartition(String logs){
-        try {
-            FileWriter fileWriter = new FileWriter(this.session,true);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            System.out.println("Escreveu");
-            bufferedWriter.write(logs+"\n");
-           // bufferedWriter.append(logs+"\n");
-            bufferedWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void updatePartition(String logs){
+//        try {
+//            FileWriter fileWriter = new FileWriter(this.session,true);
+//            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+//            System.out.println("Escreveu");
+//            bufferedWriter.write(logs+"\n");
+//           // bufferedWriter.append(logs+"\n");
+//            bufferedWriter.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

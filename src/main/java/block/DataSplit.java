@@ -38,7 +38,8 @@ public class DataSplit {
             String line = bufferedReader.readLine();
             while (line != null){
                 line = bufferedReader.readLine();
-                partition.updatePartition(line);
+                partition.setSession(line);
+                partition.setRecommendation(line);
                 String[] arg = line.split(";");
                 System.out.println(arg[2]+" "+this.getCurrentTime());
                 if(this.getCurrentTime() <= Long.parseLong(arg[2])){
