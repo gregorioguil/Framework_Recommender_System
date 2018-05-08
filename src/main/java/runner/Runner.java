@@ -4,6 +4,8 @@ import main.java.block.DataSplit;
 import main.java.recommend.Recommend;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class Runner {
@@ -26,5 +28,9 @@ public class Runner {
     public void definedBase(long unitTime,File data, File logs){
         DataSplit dataSplit = new DataSplit(unitTime,data,logs);
         dataSplit.run();
+    }
+
+    public void cleanBase(){
+
     }
 }

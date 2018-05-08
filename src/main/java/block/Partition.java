@@ -65,14 +65,16 @@ public class Partition {
     public void setRecommendation(String recommendation) {
         try {
             String[] args = recommendation.split(";");
-            String out = "";
-            for(int i = 5; i < args.length; i += 4)
-                out += args[i]+";";
-
+            String out = args[0]+";";
+            for(int i = 5; i < args.length; i += 4) {
+                out += args[i] + ";";
+                System.out.println(args[i]);
+            }
+            out  = out.substring(0,(out.length()-1));
             FileWriter fileWriter = new FileWriter(this.recommendation,true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             System.out.println("Escreveu");
-            bufferedWriter.write(recommendation+"\n");
+            bufferedWriter.write(out+"\n");
             // bufferedWriter.append(logs+"\n");
             bufferedWriter.close();
         } catch (IOException e) {
