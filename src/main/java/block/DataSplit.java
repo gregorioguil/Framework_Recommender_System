@@ -1,23 +1,19 @@
-package main.java.block;
+package block;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
+
 import java.util.ArrayList;
-import java.util.Set;
+
 
 public class DataSplit {
 
     private long unitTime;
-    private File dados;
+    private File data;
     private File logs;
     private long currentTime;
 
-    public DataSplit(long unitTime, File dados, File logs){
-        this.dados = dados;
+    public DataSplit(long unitTime, File logs,File data){
+        this.data = data;
         this.unitTime = unitTime;
         this.logs = logs;
         currentTime = unitTime;
@@ -33,11 +29,10 @@ public class DataSplit {
             Partition partition = new Partition(part);
             if(new File("BaseOfData/partition"+part).mkdirs())
                 System.out.println("Created dir BaseOfData/partition"+part);
-            fileReader = new FileReader(this.dados);
+            fileReader = new FileReader(this.logs);
             bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
             while (line != null){
-                line = bufferedReader.readLine();
                 partition.setSession(line);
                 partition.setRecommendation(line);
                 String[] arg = line.split(";");
@@ -49,7 +44,15 @@ public class DataSplit {
                     if(new File("BaseOfData/partition"+part).mkdirs())
                         System.out.println("Created dir BaseOfData/partition"+part);
                 }
+                line = bufferedReader.readLine();
                 String session = mountSession(arg);
+            }
+            fileReader = new FileReader(this.data);
+            bufferedReader = new BufferedReader(fileReader);
+            line = bufferedReader.readLine();
+            while (line != null) {
+                line = bufferedReader.readLine();
+                System.out.println(line);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -76,8 +79,8 @@ public class DataSplit {
         this.unitTime = unitTime;
     }
 
-    public void setDados(File dados) {
-        this.dados = dados;
+    public void setdata(File data) {
+        this.data = data;
     }
 
     public void setLogs(File logs) {
@@ -93,8 +96,8 @@ public class DataSplit {
         return currentTime;
     }
 
-    public File getDados() {
-        return dados;
+    public File getdata() {
+        return data;
     }
 
     public File getLogs() {

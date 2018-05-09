@@ -1,11 +1,11 @@
-package main.java.runner;
+package runner;
 
-import main.java.block.DataSplit;
-import main.java.recommend.Recommend;
+import block.DataSplit;
+import org.apache.commons.io.FileUtils;
+import recommend.Recommend;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Runner {
@@ -25,12 +25,16 @@ public class Runner {
         return 0;
     }
 
-    public void definedBase(long unitTime,File data, File logs){
-        DataSplit dataSplit = new DataSplit(unitTime,data,logs);
+    public void definedBase(long unitTime,File logs, File data){
+        DataSplit dataSplit = new DataSplit(unitTime,logs,data);
         dataSplit.run();
     }
 
     public void cleanBase(){
-
+        try {
+            FileUtils.deleteDirectory(new File("BaseOfData"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

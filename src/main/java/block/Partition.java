@@ -1,4 +1,4 @@
-package main.java.block;
+package block;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,7 +27,6 @@ public class Partition {
         try {
             FileWriter fileWriter = new FileWriter(this.articles,true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            System.out.println("Escreveu");
             bufferedWriter.write(articles+"\n");
             // bufferedWriter.append(logs+"\n");
             bufferedWriter.close();
@@ -42,6 +41,7 @@ public class Partition {
 
     public void setSession(String logs) {
         try {
+            System.out.println(logs);
             String[] args = logs.split(";");
             String out = args[0];
             for(int i = 2; i < args.length; i +=4){
@@ -49,7 +49,6 @@ public class Partition {
             }
             FileWriter fileWriter = new FileWriter(this.session,true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            System.out.println("Escreveu");
             bufferedWriter.write(out+"\n");
             // bufferedWriter.append(logs+"\n");
             bufferedWriter.close();
@@ -73,7 +72,6 @@ public class Partition {
             out  = out.substring(0,(out.length()-1));
             FileWriter fileWriter = new FileWriter(this.recommendation,true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            System.out.println("Escreveu");
             bufferedWriter.write(out+"\n");
             // bufferedWriter.append(logs+"\n");
             bufferedWriter.close();

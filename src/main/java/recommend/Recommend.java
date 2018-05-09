@@ -1,4 +1,4 @@
-package main.java.recommend;
+package recommend;
 
 public interface Recommend {
 

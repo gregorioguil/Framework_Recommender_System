@@ -1,8 +1,4 @@
-package test.java;
-
-
-
-import main.java.block.DataSplit;
+import block.DataSplit;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
