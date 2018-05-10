@@ -50,9 +50,16 @@ public class DataSplit {
             fileReader = new FileReader(this.data);
             bufferedReader = new BufferedReader(fileReader);
             line = bufferedReader.readLine();
+            if(new File("BaseOfData/partition"+part).mkdirs())
+                System.out.println("Created dir BaseOfData/articles");
             while (line != null) {
                 line = bufferedReader.readLine();
-                System.out.println(line);
+                String[] arg = line.split(";");
+                if(this.getCurrentTime() >= Long.parseLong(arg[2])){
+                    partition.setArticles(line);
+                }else {
+                    break;
+                }
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

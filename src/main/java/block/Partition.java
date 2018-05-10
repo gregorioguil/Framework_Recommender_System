@@ -15,7 +15,7 @@ public class Partition {
     public Partition(Integer id){
         this.id = id;
         this.session = new File("BaseOfData/partition"+id+"/sessions.txt");
-        this.articles = new File("BaseOfData/partition"+id+"/articles.txt");
+        this.articles = new File("BaseOfData/articles/data.txt");
         this.recommendation = new File("BaseOfData/partition"+id+"/recommendation.txt");
     }
 
@@ -28,7 +28,6 @@ public class Partition {
             FileWriter fileWriter = new FileWriter(this.articles,true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write(articles+"\n");
-            // bufferedWriter.append(logs+"\n");
             bufferedWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
