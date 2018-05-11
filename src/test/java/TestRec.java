@@ -1,7 +1,4 @@
-package test.java;
-
-
-import main.java.recommend.Recommend;;
+import recommend.Recommend;
 
 public class TestRec implements Recommend {
 
