@@ -60,7 +60,6 @@ public class DataSplit {
                 String[] arg = line.split(";");
                 System.out.println(this.getCurrentTime()+" "+Long.parseLong(arg[2]));
                 if(this.getCurrentTime() >= Long.parseLong(arg[2])){
-                    System.out.println("Dentro do if");
                     this.setArticles(line);
                 }else {
                     break;
