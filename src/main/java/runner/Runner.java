@@ -13,7 +13,7 @@ public class Runner {
     private ArrayList<Recommend> recommends;
     private int numRecommendation;
     private String lastArticle;
-    //private ArrayList<File> partition;
+
 
     public Runner(ArrayList<Recommend> recommends, int numRecommendation){
         this.recommends = recommends;
