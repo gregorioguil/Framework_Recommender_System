@@ -11,23 +11,30 @@ import java.util.ArrayList;
 public class Runner {
 
     private ArrayList<Recommend> recommends;
-    private int numRecomendacao;
+    private int numRecommendation;
+    private String lastArticle;
     //private ArrayList<File> partition;
 
-    public Runner(ArrayList<Recommend> recommends, int numRecomendacao){
+    public Runner(ArrayList<Recommend> recommends, int numRecommendation){
         this.recommends = recommends;
-        this.numRecomendacao = numRecomendacao;
+        this.numRecommendation = numRecommendation;
         //this.partition = partition;
     }
 
     public int run(){
-
+        Recommend syst = null;
+        for(int i = 0; i < this.recommends.size(); i++){
+            syst = this.recommends.get(i);
+            syst.init();
+            syst.run();
+        }
         return 0;
     }
 
     public void definedBase(long unitTime,File logs, File data){
         DataSplit dataSplit = new DataSplit(unitTime,logs,data);
         dataSplit.run();
+        this.lastArticle = dataSplit.getlastArticle();
     }
 
     public void cleanBase(){

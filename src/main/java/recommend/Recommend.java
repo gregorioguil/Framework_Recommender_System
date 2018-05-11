@@ -2,5 +2,16 @@ package recommend;
 
 public interface Recommend {
 
-    public void run();
+    // run the system recommendation
+    void run();
+
+    // initial the historic data
+    void init();
+
+    /**
+     * Receive news items
+     * @param article it is a line of features in the article.
+     */
+    void getNews(String article);
+
 }

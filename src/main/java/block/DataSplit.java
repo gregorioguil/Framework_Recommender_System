@@ -12,6 +12,7 @@ public class DataSplit {
     private File logs;
     private  File articles;
     private long currentTime;
+    private String lastArticle;
     static final String pathArticles = "BaseOfData/articles/data.txt";
 
     public DataSplit(long unitTime, File logs,File data){
@@ -125,5 +126,13 @@ public class DataSplit {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void lastArticle(String id){
+        this.lastArticle = id;
+    }
+
+    public String getlastArticle() {
+        return this.lastArticle;
     }
 }
