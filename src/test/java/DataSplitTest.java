@@ -1,11 +1,11 @@
 import block.DataSplit;
-import org.junit.jupiter.api.Test;
+
 
 import java.io.File;
 
 public class DataSplitTest {
 
-    @Test
+    //@Test
     public void read() {
         String path = "/home/gregorio/Documentos/Guilherme IC/sessoesJOAcomRecOrdenado.csv";
         File logs = new File(path);

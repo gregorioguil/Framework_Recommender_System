@@ -10,7 +10,9 @@ public class DataSplit {
     private long unitTime;
     private File data;
     private File logs;
+    private  File articles;
     private long currentTime;
+    static final String pathArticles = "BaseOfData/articles/data.txt";
 
     public DataSplit(long unitTime, File logs,File data){
         this.data = data;
@@ -50,16 +52,20 @@ public class DataSplit {
             fileReader = new FileReader(this.data);
             bufferedReader = new BufferedReader(fileReader);
             line = bufferedReader.readLine();
-            if(new File("BaseOfData/partition"+part).mkdirs())
+            if(new File("BaseOfData/articles").mkdirs())
                 System.out.println("Created dir BaseOfData/articles");
+
+            this.articles = new File(pathArticles);
             while (line != null) {
-                line = bufferedReader.readLine();
                 String[] arg = line.split(";");
+                System.out.println(this.getCurrentTime()+" "+Long.parseLong(arg[2]));
                 if(this.getCurrentTime() >= Long.parseLong(arg[2])){
-                    partition.setArticles(line);
+                    System.out.println("Dentro do if");
+                    this.setArticles(line);
                 }else {
                     break;
                 }
+                line = bufferedReader.readLine();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -109,5 +115,16 @@ public class DataSplit {
 
     public File getLogs() {
         return logs;
+    }
+
+    public void setArticles(String line) {
+        try {
+            FileWriter fileWriter = new FileWriter(this.articles,true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(line+"\n");
+            bufferedWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

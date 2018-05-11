@@ -8,31 +8,18 @@ import java.io.IOException;
 public class Partition {
 
     private Integer id;
-    private File articles;
     private File session;
     private File recommendation;
 
     public Partition(Integer id){
         this.id = id;
         this.session = new File("BaseOfData/partition"+id+"/sessions.txt");
-        this.articles = new File("BaseOfData/articles/data.txt");
+
         this.recommendation = new File("BaseOfData/partition"+id+"/recommendation.txt");
     }
 
-    public File getArticles() {
-        return articles;
-    }
 
-    public void setArticles(String articles) {
-        try {
-            FileWriter fileWriter = new FileWriter(this.articles,true);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(articles+"\n");
-            bufferedWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     public File getSession() {
         return session;
