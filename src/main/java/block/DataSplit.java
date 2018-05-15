@@ -3,57 +3,82 @@ package block;
 import java.io.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class DataSplit {
-
+    private long initTime;
     private long unitTime;
     private File data;
     private File logs;
     private  File articles;
     private long currentTime;
     private String lastArticle;
-    static final String pathArticles = "BaseOfData/articles/data.txt";
+    static final String pathArticles = "DataBase/articles/data.txt";
 
-    public DataSplit(long unitTime, File logs,File data){
+    public DataSplit(long initTime, long unitTime, File logs, File data){
         this.data = data;
         this.unitTime = unitTime;
         this.logs = logs;
         currentTime = unitTime;
+        this.initTime = initTime;
     }
 
     public void run() {
-
+        System.out.println("Iniciando conexão com o banco de dados...");
+//        InterfaceDB interfaceDB = new InterfaceDB("framework_journal");
+//        interfaceDB.connect();
+//        try {
+//            System.in.read();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
-        int part = 1;
-
+        int part = 0;
+        Map<String, Long> task = new HashMap<String, Long>();
         try {
             Partition partition = new Partition(part);
-            if(new File("BaseOfData/partition"+part).mkdirs())
-                System.out.println("Created dir BaseOfData/partition"+part);
+            if(new File("DataBase/partition"+part).mkdirs())
+                System.out.println("Created dir DataBase/partition"+part);
             fileReader = new FileReader(this.logs);
             bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
+            int cont = 0;
             while (line != null){
-                partition.setSession(line);
-                partition.setRecommendation(line);
+                System.out.println(cont);
+                cont++;
+
                 String[] arg = line.split(";");
-                System.out.println(arg[2]+" "+this.getCurrentTime());
+                //System.out.println(arg[2]+" "+this.getCurrentTime());
+
+                line = bufferedReader.readLine();
+
+                task = mountTask(arg,task);
+                task = MapSort.sortByValue(task);
+                Object out = MapSort.getFirst(task);
+                String[] key = ((String) out.toString()).split("=");
+                System.out.println("Tamanho do map:"+task.size());
+                task.remove(key[0]);
+                partition.setSession(key[0]);
                 if(this.getCurrentTime() <= Long.parseLong(arg[2])){
                     part ++;
                     partition = new Partition(part);
                     this.setCurrentTime();
-                    if(new File("BaseOfData/partition"+part).mkdirs())
-                        System.out.println("Created dir BaseOfData/partition"+part);
+                    if(new File("DataBase/partition"+part).mkdirs())
+                        System.out.println("Created dir DataBase/partition"+part);
                 }
-                line = bufferedReader.readLine();
-                String session = mountSession(arg);
+                System.out.println("Tamanho do map:"+task.size());
+                //System.in.read();
             }
+            System.out.println("Inicio da ordenação.");
+            task = MapSort.sortByValue(task);
+            System.out.println("Acabou de ordenar.");
             fileReader = new FileReader(this.data);
             bufferedReader = new BufferedReader(fileReader);
             line = bufferedReader.readLine();
-            if(new File("BaseOfData/articles").mkdirs())
+            if(new File("DataBase/articles").mkdirs())
                 System.out.println("Created dir BaseOfData/articles");
 
             this.articles = new File(pathArticles);
@@ -75,10 +100,16 @@ public class DataSplit {
 
     }
 
-    private String mountSession(String[] arg) {
-        // userId;sizeOfSession;time;article,[article1,article2,article3,article4];time;articleX...
-        String session = arg[0];
-        return session;
+    private Map<String, Long> mountTask(String[] arg, Map<String, Long> task) throws IOException {
+        // <u1,a1,time1,s1>
+        String flagTaks = "";
+        for(int i = 3; i < arg.length; i += 4) {
+            flagTaks += ";" + arg[i];
+            flagTaks += ";" + arg[i+1];
+            task.put(arg[0]+";"+arg[1]+flagTaks,Long.parseLong(arg[i]));
+            flagTaks = "";
+        }
+        return task;
     }
 
     public static ArrayList<File>    mountPartirion(long unitTime){

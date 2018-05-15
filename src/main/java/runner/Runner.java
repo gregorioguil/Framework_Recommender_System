@@ -26,15 +26,16 @@ public class Runner {
         for(int i = 0; i < this.recommends.size(); i++){
             syst = this.recommends.get(i);
             syst.init();
+            //syst.getUserIten();
             syst.run();
         }
         return 0;
     }
 
-    public void definedBase(long unitTime,File logs, File data){
-        DataSplit dataSplit = new DataSplit(unitTime,logs,data);
+    public void definedBase(long initTime,long unitTime,File logs, File data) throws IOException {
+        DataSplit dataSplit = new DataSplit(initTime,unitTime,logs,data);
         dataSplit.run();
-        this.lastArticle = dataSplit.getlastArticle();
+        //this.lastArticle = dataSplit.getlastArticle();
     }
 
     public void cleanBase(){

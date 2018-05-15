@@ -1,4 +1,4 @@
-package System_Recommendation;
+package system_recommendation;
 
 import recommend.Recommend;
 
