@@ -13,9 +13,9 @@ public class Partition {
 
     public Partition(Integer id){
         this.id = id;
-        this.session = new File("BaseOfData/partition"+id+"/sessions.txt");
+        this.session = new File("DataBase/partition"+id+"/sessions.txt");
 
-        this.recommendation = new File("BaseOfData/partition"+id+"/recommendation.txt");
+        this.recommendation = new File("DataBase/partition"+id+"/recommendation.txt");
     }
 
 
@@ -27,15 +27,9 @@ public class Partition {
 
     public void setSession(String logs) {
         try {
-            System.out.println(logs);
-            String[] args = logs.split(";");
-            String out = args[0];
-            for(int i = 2; i < args.length; i +=4){
-                out += ";"+ args[i]+";"+args[i+1];
-            }
             FileWriter fileWriter = new FileWriter(this.session,true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(out+"\n");
+            bufferedWriter.write(logs+"\n");
             // bufferedWriter.append(logs+"\n");
             bufferedWriter.close();
         } catch (IOException e) {
@@ -73,6 +67,19 @@ public class Partition {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public void setNotification(String id,Long timePublication) {
+
+        try {
+            FileWriter fileWriter = new FileWriter(this.session,true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(id+";"+timePublication+"\n");
+            // bufferedWriter.append(logs+"\n");
+            bufferedWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 //    public void updatePartition(String logs){

@@ -35,8 +35,8 @@ public class DataBase {
             String sql = "CREATE TABLE IF NOT EXISTS article " +
                     "(article_id INT PRIMARY KEY NOT NULL," +
                     "publication TEXT NOT NULL," +
-                    "wordtitle TEXT[][]," +
-                    "wordtext TEXT[][])";
+                    "wordtitle TEXT[]," +
+                    "wordtext TEXT[])";
             statement.executeUpdate(sql);
             statement.close();
         } catch (SQLException e) {
@@ -47,30 +47,28 @@ public class DataBase {
     public void insertArticle(String line) {
         Statement statement = null;
         String[] argsArticle = line.split(";");
-        String values = "("+Integer.parseInt(argsArticle[0])+","+argsArticle[2]+")";
+        String values = "("+Integer.parseInt(argsArticle[0])+","+argsArticle[2];
         String[] title = {argsArticle[18],argsArticle[19],argsArticle[20]};
         String[] text = new String[30];
 
         int j = 0;
         for(int i = 21; i < argsArticle.length; i++){
             text[j] = argsArticle[i];
+            j++;
         }
-        String sql = "INSERT INTO article VALUES"+values;
+
         try {
-//            statement = this.connection.createStatement();
-//            statement.executeUpdate(sql);
-            sql = "INSERT INTO article VALUES("+Integer.parseInt(argsArticle[0])+","+argsArticle[2]+",?, ?)";
+            statement = this.connection.createStatement();
             Array arrayTitle = connection.createArrayOf("text",title);
             Array arrayText = connection.createArrayOf("text",text);
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1,"wordtitle");
-            preparedStatement.setArray(2,arrayTitle);
-            preparedStatement.executeUpdate();
-            preparedStatement.setString(1,"wordtext");
-            preparedStatement.setArray(2,arrayText);
-            preparedStatement.executeUpdate();
-//            statement.close();
-            preparedStatement.close();
+            values += ",'"+arrayTitle+"','"+arrayText+"')";
+            String sql = "INSERT INTO article VALUES "+values+" ON CONFLICT (article_id) DO NOTHING";
+            //System.out.println(sql);
+
+            statement.executeUpdate(sql);
+
+            statement.close();
+//            preparedStatement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
