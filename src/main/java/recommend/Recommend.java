@@ -6,7 +6,7 @@ public interface Recommend {
     void run();
 
     // initial the historic data
-    void init();
+    void init(int numberOfRecommend);
 
     /**
      * Receive news items

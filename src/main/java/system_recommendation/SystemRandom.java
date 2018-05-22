@@ -12,7 +12,7 @@ public class SystemRandom implements Recommend {
         System.out.println("Sistema de Recomendação Randômico.");
     }
 
-    public void init() {
+    public void init(int numRecommend) {
 
     }
 

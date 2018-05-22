@@ -11,9 +11,11 @@ public class TestRec implements Recommend {
         System.out.println("Sistema de recomendaçao");
     }
 
-    public void init() {
+    @Override
+    public void init(int numberOfRecommend) {
 
     }
+
 
     public void getNews(String article) {
 

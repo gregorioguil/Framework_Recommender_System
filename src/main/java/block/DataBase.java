@@ -36,7 +36,8 @@ public class DataBase {
                     "(article_id INT PRIMARY KEY NOT NULL," +
                     "publication TEXT NOT NULL," +
                     "wordtitle TEXT[]," +
-                    "wordtext TEXT[])";
+                    "wordtext TEXT[]," +
+                    "existe BOOLEAN)";
             statement.executeUpdate(sql);
             statement.close();
         } catch (SQLException e) {
@@ -50,6 +51,9 @@ public class DataBase {
         String values = "("+Integer.parseInt(argsArticle[0])+","+argsArticle[2];
         String[] title = {argsArticle[18],argsArticle[19],argsArticle[20]};
         String[] text = new String[30];
+        boolean exist = false;
+        if(Long.parseLong(argsArticle[2]) < 0)
+            exist = true;
 
         int j = 0;
         for(int i = 21; i < argsArticle.length; i++){
@@ -61,7 +65,7 @@ public class DataBase {
             statement = this.connection.createStatement();
             Array arrayTitle = connection.createArrayOf("text",title);
             Array arrayText = connection.createArrayOf("text",text);
-            values += ",'"+arrayTitle+"','"+arrayText+"')";
+            values += ",'"+arrayTitle+"','"+arrayText+"',"+exist+")";
             String sql = "INSERT INTO article VALUES "+values+" ON CONFLICT (article_id) DO NOTHING";
             //System.out.println(sql);
 
@@ -72,5 +76,44 @@ public class DataBase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public Long getTimePublicationArticle(String s) {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        Long publication = null;
+        try {
+            String query = "Select publication from article where article_id = "+s;
+            System.out.println(query);
+            statement = this.connection.createStatement();
+            resultSet = statement.executeQuery(query);
+            while(resultSet.next()) {
+                publication = Long.parseLong(resultSet.getString(1));
+                System.out.println("Publication: "+publication);
+            }
+            resultSet.close();
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return publication;
+    }
+
+    public boolean verifyExists(String s) {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        boolean exist = false;
+        try {
+            String query = "Select * from article where article_id = "+Integer.parseInt(s);
+
+            statement = this.connection.createStatement();
+            resultSet = statement.executeQuery(query);
+            exist = resultSet.getBoolean(4);
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return exist;
     }
 }
