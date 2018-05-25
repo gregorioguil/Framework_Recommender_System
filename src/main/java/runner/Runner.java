@@ -32,7 +32,7 @@ public class Runner {
         return 0;
     }
 
-    public void definedBase(long initTime,long unitTime,File logs, File data) throws IOException {
+    public void definedBase(double initTime,double unitTime,File logs, File data) throws IOException {
         DataSplit dataSplit = new DataSplit(initTime,unitTime,logs,data);
         dataSplit.insertData("/home/gregorio/Dropbox/Ufop/Iniciação Cientifica 2/DadosUnificados/data.csv");
         dataSplit.run();

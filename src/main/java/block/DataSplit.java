@@ -6,25 +6,25 @@ import java.util.*;
 
 
 public class DataSplit {
-    private long initTime;
-    private long unitTime;
+    private double initTime;
+    private double unitTime;
     private File data;
     private File logs;
     private  File articles;
-    private long currentTime;
+    private double currentTime;
     private String lastArticle;
-    private long secondsDay;
-    static final String pathArticles = "DataBase/articles/";
-    private TreeMap<String,Integer> indices;
+    private double secondsDay;
+    static final String pathArticles = "/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/articles/";
+    private TreeMap<String,String> indices;
 
-    public DataSplit(long initTime, long unitTime, File logs, File data){
+    public DataSplit(double initTime, double unitTime, File logs, File data){
         this.data = data;
         this.unitTime = unitTime;
         this.logs = logs;
         currentTime = unitTime;
         this.initTime = initTime;
         this.secondsDay = 0;
-        this.indices = new TreeMap<String, Integer>();
+        this.indices = new TreeMap<String, String>();
     }
 
 
@@ -33,61 +33,51 @@ public class DataSplit {
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
         int part = 0;
-        Map<String, Long> task = new HashMap<String, Long>();
+        Map<String, Double> task = new HashMap<String, Double>();
         try {
 
-            Partition partition = new Partition(part);
-            if (new File("DataBase/partition" + part).mkdirs())
+
+            if (new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/partition" + part).mkdirs())
                 System.out.println("Created dir DataBase/partition" + part);
+            Partition partition = new Partition(part);
             fileReader = new FileReader(this.logs);
             bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
+            String[] arg = line.split(";");
+            task = mountTask(arg, task);
             int cont = 0;
 
             while (line != null) {
+
+                task = MapSort.sortByValue(task);
+                Object out = MapSort.getLast(task);
+                Double timeTask = getTimeTask(out);
+                line = bufferedReader.readLine();
+                if(line == null){
+                    task = writePartition(task, partition);
+                    break;
+                }
                 System.out.println(cont);
                 cont++;
 //                if(cont == 100)
 //                    break;
-                String[] arg = line.split(";");
-                //System.out.println(arg[2]+" "+this.getCurrentTime());
-                //System.out.println(task);
-                task = mountTask(arg, task);
-                task = MapSort.sortByValue(task);
-                Object out = MapSort.getLast(task);
-                Long timeTask = getTimeTask(out);
-                System.out.println(timeTask+" "+this.getCurrentTime()+" "+task.size());
-                if (timeTask >= this.getCurrentTime()) {
-                    part++;
-
+                arg = line.split(";");
+                if(timeTask <= Double.parseDouble(arg[3]) && task.size() >= 10){
                     task = writePartition(task, partition);
-                    partition = new Partition(part);
-                    this.setCurrentTime();
-                    if (new File("DataBase/partition" + part).mkdirs())
-                        System.out.println("Created dir DataBase/partition" + part);
-                    //System.in.read();
-                }
+                }else{
+                    if(timeTask >= this.getCurrentTime()){
+                        part++;
 
-                    //                } else {
-//                    //System.out.println("Escreveu na particao, apenas 1.");
-//                    out = MapSort.getFirst(task);
-//                    String[] key = ((String) out.toString()).split("=");
-//                    String[] id = key[0].split(";");
-//                    Long timePublication = getTimePublicationArticle(id[3]);
-//                    if (timePublication == null) {
-//                        task.remove(key[0]);
-//                        continue;
-//                    }
-//
-//                    if (timePublication > 0) {
-//                        if (!verifyExists(id[3])) {
-//                            partition.setNotification(id[3], timePublication);
-//                        }
-//                    }
-//                    partition.setSession(key[0]);
-//                    task.remove(key[0]);
-//                }
-                line = bufferedReader.readLine();
+                        task = writePartition(task, partition);
+                        partition.closed();
+                        partition = null;
+                        this.setCurrentTime();
+                        if (new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/partition" + part).mkdirs())
+                            System.out.println("Created dir DataBase/partition" + part);
+                        partition = new Partition(part);
+                    }
+                }
+                task = mountTask(arg, task);
             }
 
         } catch (IOException e) {
@@ -96,20 +86,22 @@ public class DataSplit {
 
     }
 
-    private Long getTimePublicationArticle(String s) {
+    private Double getTimePublicationArticle(String s) {
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
-        Integer day = this.indices.get(s);
-        if(day == null) {
+        String dado = this.indices.get(s);
+
+        if(dado == null) {
             return null;
         }
-        Long timePublication = null;
+        String[] day = dado.split(";");
+        Double timePublication = null;
         try {
-            fileReader = new FileReader(pathArticles+day+"/"+s+".txt");
+            fileReader = new FileReader(pathArticles+day[0]+"/"+s+".txt");
             bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
             String[] arg = line.split(";");
-            timePublication = Long.parseLong(arg[2]);
+            timePublication = Double.parseDouble(arg[2]);
         } catch (IOException e) {
             return timePublication;
         }
@@ -117,11 +109,11 @@ public class DataSplit {
         return timePublication;
     }
 
-    public  TreeMap<String, Integer> getIndices() {
+    public  TreeMap<String, String> getIndices() {
         return indices;
     }
 
-    public void setIndices(TreeMap<String, Integer> indices) {
+    public void setIndices(TreeMap<String, String> indices) {
         this.indices = indices;
     }
 
@@ -137,22 +129,26 @@ public class DataSplit {
             fileReader = new FileReader(path);
             bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
-            if(new File("DataBase/articles/"+day+"/").mkdirs())
+            if(new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/articles/"+day+"/").mkdirs())
                 System.out.println("Created dir DataBase/articles/"+day+"/");
-
+            //System.in.read();
             int cont = 0;
             while (line != null) {
                 String[] arg = line.split(";");
-                Long timeStamp = Long.parseLong(arg[2]);
+                Double timeStamp = Double.parseDouble(arg[2]);
                 if (timeStamp > this.getSecondsDay()) {
                     day++;
-                    if (new File("DataBase/articles/" + day + "/").mkdirs())
+                    if (new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/articles/" + day + "/").mkdirs())
                         System.out.println("Created dir DataBase/articles/" + day + "/");
                     this.setSecondsDay();
                 }
                 writeArticleFile(arg[0], line, day);
-                this.indices.put(arg[0], day);
-                //System.out.println(this.getCurrentTime()+" "+Long.parseLong(arg[2]));
+                if(timeStamp > 0){
+                    this.indices.put(arg[0], day+";false");
+                }else{
+                    this.indices.put(arg[0], day+";true");
+                }
+                //System.out.println(this.getCurrentTime()+" "+Double.parseDouble(arg[2]));
                 //dataBase.insertArticle(line);
 
                 line = bufferedReader.readLine();
@@ -168,8 +164,8 @@ public class DataSplit {
 
     private void writeArticleFile(String s, String line, int day) {
         try {
-            File file = new File("DataBase/articles/"+day+"/"+s+".txt");
-            FileWriter fileWriter = new FileWriter("DataBase/articles/"+day+"/"+s+".txt");
+            File file = new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/articles/"+day+"/"+s+".txt");
+            FileWriter fileWriter = new FileWriter("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/articles/"+day+"/"+s+".txt");
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write(line);
             bufferedWriter.close();
@@ -178,7 +174,7 @@ public class DataSplit {
         }
     }
 
-    public Long getSecondsDay(){
+    public double getSecondsDay(){
         return this.secondsDay;
     }
 
@@ -186,61 +182,65 @@ public class DataSplit {
         this.secondsDay += 86400;
     }
 
-    private Map<String, Long> mountTask(String[] arg, Map<String, Long> task) throws IOException {
+    private Map<String, Double> mountTask(String[] arg, Map<String, Double> task) throws IOException {
         // <u1,s1,time1,a1>
         String flagTaks = "";
         for(int i = 3; i < arg.length; i += 4) {
             flagTaks += ";" + arg[i];
             flagTaks += ";" + arg[i+1];
-            task.put(arg[0]+";"+arg[1]+flagTaks,Long.parseLong(arg[i]));
+            task.put(arg[0]+";"+arg[1]+flagTaks,Double.parseDouble(arg[i]));
             flagTaks = "";
         }
         return task;
     }
 
-    public static ArrayList<File>    mountPartirion(long unitTime){
+    public static ArrayList<File>    mountPartirion(Double unitTime){
         ArrayList<File> partitions = new ArrayList<File>();
         return partitions;
     }
 
-    private static Long getTimeTask(Object object){
+    private static Double getTimeTask(Object object){
         String[] key = ((String) object.toString()).split("=");
         String[] id = key[0].split(";");
-        return Long.parseLong(id[2]);
+        return Double.parseDouble(id[2]);
     }
 
 
-    public Map<String,Long> writePartition(Map<String, Long> tasks, Partition partition){
-        //Set<String> set = tasks.keySet();
-        //Iterator<String> iterator = set.iterator();
-
+    public Map<String,Double> writePartition(Map<String, Double> tasks, Partition partition) throws IOException {
+        System.out.println("Escrita na partição "+partition.getId());
+        ArrayList<String> taskOut = new ArrayList<String>();
         while(tasks.size()  > 0){
             Object object = MapSort.getFirst(tasks);
             String[] key = ((String) object.toString()).split("=");
             String[] arg = key[0].split(";");
-            System.out.println(arg[3]);
-            Long timePublication = getTimePublicationArticle(arg[3]);
+            //System.out.println(arg[3]);
+            Double timePublication = getTimePublicationArticle(arg[3]);
             if(timePublication == null) {
-
                 tasks.remove(key[0]);
-                System.out.println("Não existe na base.");
                 continue;
-
             }
             if(timePublication > 0) {
-                if(!verifyExists(arg[3]))
+                if (!verifyExists(arg[3])) {
                     partition.setNotification(arg[3], timePublication);
+                }
             }
-            partition.setSession(key[0]);
+            taskOut.add(key[0]);
             tasks.remove(key[0]);
+        }
+        if(taskOut != null) {
+            System.out.println("Esse é o 0:"+taskOut.size());
+            partition.setSession(taskOut);
         }
         return tasks;
     }
 
     private boolean verifyExists(String s) {
-        if(this.indices.containsKey(s)){
+        String[] dado = this.indices.get(s).split(";");
+        if(dado[1].equals("true")){
             return true;
         }
+        this.indices.remove(s);
+        this.indices.put(s,dado[0]+";true");
         return false;
     }
 
@@ -248,7 +248,7 @@ public class DataSplit {
         this.currentTime += this.unitTime;
     }
 
-    public void setUnitTime(long unitTime) {
+    public void setUnitTime(Double unitTime) {
         this.unitTime = unitTime;
     }
 
@@ -260,12 +260,12 @@ public class DataSplit {
         this.logs = logs;
     }
 
-    public long getUnitTime() {
+    public double getUnitTime() {
 
         return unitTime;
     }
 
-    public  long getCurrentTime(){
+    public double getCurrentTime(){
         return currentTime;
     }
 

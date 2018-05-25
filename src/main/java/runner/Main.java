@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String [] args){
-        long iniTime = 0, unitTime = 604800;
+        double iniTime = 0, unitTime = 604800;
         SystemRandom syst1 = new SystemRandom();
         ArrayList<Recommend> recommends = new ArrayList<Recommend>();
         recommends.add(syst1);
