@@ -4,11 +4,14 @@ import block.DataSplitFactory;
 import block.DataSplitFactoryImpl;
 import evaluate.Metrics;
 import recommend.Recommend;
+import runner.RunnerFactory;
+import runner.RunnerFactoryImpl;
 
 import java.util.ArrayList;
 
 public class Framework {
     private static DataSplitFactory dataSplitFactory = null;
+    private  static RunnerFactory runnerFactory = null;
     private static ArrayList<Recommend> recommends = new ArrayList<Recommend>();
     public static void insertData(String logs, String data){
         dataSplitFactory = new DataSplitFactoryImpl();
@@ -24,7 +27,9 @@ public class Framework {
     }
 
     public static void runRunner(int numberOfRecommend){
-
+        runnerFactory = new RunnerFactoryImpl();
+        runnerFactory.createRunner(recommends,numberOfRecommend);
+        runnerFactory.run();
     }
 
     public static void insertMetrics(Metrics metrics){
