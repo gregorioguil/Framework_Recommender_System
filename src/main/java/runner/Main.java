@@ -15,7 +15,7 @@ public class Main {
 
     public static void main(String [] args){
         double iniTime = 0, unitTime = 604800;
-//        Framework.insertData("/home/gregorio/Documentos/Guilherme IC/logNormalized.csv","/home/gregorio/Dropbox/Ufop/Iniciação Cientifica 2/DadosUnificados/data.csv");//        SystemRandom syst1 = new SystemRandom();
+//        Framework.insertData("/home/gregorio/Documentos/Guilherme IC/logNormalized.csv","/home/gregorio/Dropbox/Ufop/Iniciação Cientifica 2/DadosUnificados/data.csv");
 //        Framework.runDataSplit(unitTime,iniTime);
         SystemRandom systemRandom = new SystemRandom();
         Framework.insertRecSys(systemRandom);

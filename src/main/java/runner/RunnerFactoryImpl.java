@@ -9,8 +9,8 @@ public class RunnerFactoryImpl extends RunnerFactory {
 
 
     @Override
-    public void createRunner(ArrayList<Recommend> recommends,int numberOfrecommend) {
-        runner = new RunnerImpl(recommends,numberOfrecommend);
+    public void createRunner(ArrayList<Recommend> recommends, int numberOfrecommend, String path, int numberPartitions) {
+        runner = new RunnerImpl(recommends,numberOfrecommend,path,numberPartitions);
     }
 
     @Override

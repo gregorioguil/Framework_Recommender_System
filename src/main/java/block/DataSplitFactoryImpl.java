@@ -12,4 +12,9 @@ public class DataSplitFactoryImpl extends DataSplitFactory{
     public void run(Double unitTime, Double initTime) {
         dataSplit.run(unitTime,initTime);
     }
+
+    @Override
+    public int getNumberPartitions() {
+        return dataSplit.getNumberPartitions();
+    }
 }

@@ -14,35 +14,45 @@ class DataSplitImpl extends DataSplit {
     private double currentTime;
     private String lastArticle;
     private double secondsDay;
-    static final String pathArticles = "/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/articles/";
+    static  String pathDataBase;
     private TreeMap<String,String> indices;
+    private int numberPartitions;
 
     public DataSplitImpl( String logs, String data){
         this.data = new File(data);
 
         this.logs = new File(logs);
-
-
         this.secondsDay = 0;
         this.indices = new TreeMap<String, String>();
+        String[] path = data.split("/");
+        this.pathDataBase = "";
+        for(int i = 0; i < path.length -1; i++)
+            this.pathDataBase += "/"+path[i];
+        this.pathDataBase += "/DataBase/";
     }
 
+    public int getNumberPartitions(){
+        return this.numberPartitions;
+    }
 
+    public void setNumberPartitions(int numberPartitions){
+        this.numberPartitions = numberPartitions;
+    }
 
     public void run(Double unitTime, Double initTime) {
         this.unitTime = unitTime;
         this.initTime = initTime;
         currentTime = unitTime;
-        FileReader fileReader = null;
-        BufferedReader bufferedReader = null;
+        FileReader fileReader;
+        BufferedReader bufferedReader;
         int part = 0;
         Map<String, Double> task = new HashMap<String, Double>();
         try {
 
 
-            if (new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/partition" + part).mkdirs())
+            if (new File(this.pathDataBase + "partition" + part).mkdirs())
                 System.out.println("Created dir DataBase/partition" + part);
-            Partition partition = new Partition(part);
+            //Partition partition = new Partition(part,this.pathDataBase);
             fileReader = new FileReader(this.logs);
             bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
@@ -56,37 +66,43 @@ class DataSplitImpl extends DataSplit {
                 Object out = MapSort.getLast(task);
                 Double timeTask = getTimeTask(out);
                 line = bufferedReader.readLine();
-                if(line == null){
-                    task = writePartition(task, partition);
+                if (line == null) {
+                    writePartition(task, part);
                     break;
                 }
-                System.out.println(cont);
+                //System.out.println(cont);
                 cont++;
 //                if(cont == 100)
 //                    break;
                 arg = line.split(";");
-                if(timeTask <= Double.parseDouble(arg[3]) && task.size() >= 10){
-                    task = writePartition(task, partition);
-                }else{
-                    if(timeTask >= this.getCurrentTime()){
-                        part++;
-
-                        task = writePartition(task, partition);
-                        partition.closed();
-                        partition = null;
+                if (timeTask <= Double.parseDouble(arg[3])) {
+                    task = writePartition(task, part);
+                } else {
+                    if (Double.parseDouble(arg[3]) >= this.getCurrentTime()) {
+                        task = MapSort.sortByValue(task);
+                        System.out.println("Ordenado!");
+                        task = writePartition(task, part);
+                        System.out.println("Escrito!");
+//                    partition.closed();
+//                    partition = null;
                         this.setCurrentTime();
-                        if (new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/partition" + part).mkdirs())
+                        part++;
+                        setNumberPartitions(part);
+                        if (new File(pathDataBase + "partition" + part).mkdirs())
                             System.out.println("Created dir DataBase/partition" + part);
-                        partition = new Partition(part);
+                        //partition = new Partition(part, pathDataBase);
                     }
                 }
+
                 task = mountTask(arg, task);
             }
 
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private Double getTimePublicationArticle(String s) {
@@ -100,7 +116,7 @@ class DataSplitImpl extends DataSplit {
         String[] day = dado.split(";");
         Double timePublication = null;
         try {
-            fileReader = new FileReader(pathArticles+day[0]+"/"+s+".txt");
+            fileReader = new FileReader(this.pathDataBase+"articles/"+day[0]+"/"+s+".txt");
             bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
             String[] arg = line.split(";");
@@ -127,12 +143,13 @@ class DataSplitImpl extends DataSplit {
     public void insertData(String path) {
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
+
         int day = 0;
         try {
             fileReader = new FileReader(path);
             bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
-            if(new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/articles/"+day+"/").mkdirs())
+            if(new File(pathDataBase+"articles/"+day+"/").mkdirs())
                 System.out.println("Created dir DataBase/articles/"+day+"/");
             //System.in.read();
             int cont = 0;
@@ -141,7 +158,7 @@ class DataSplitImpl extends DataSplit {
                 Double timeStamp = Double.parseDouble(arg[2]);
                 if (timeStamp > this.getSecondsDay()) {
                     day++;
-                    if (new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/articles/" + day + "/").mkdirs())
+                    if (new File(pathDataBase+"articles/" + day + "/").mkdirs())
                         System.out.println("Created dir DataBase/articles/" + day + "/");
                     this.setSecondsDay();
                 }
@@ -167,8 +184,8 @@ class DataSplitImpl extends DataSplit {
 
     private void writeArticleFile(String s, String line, int day) {
         try {
-            File file = new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/articles/"+day+"/"+s+".txt");
-            FileWriter fileWriter = new FileWriter("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/articles/"+day+"/"+s+".txt");
+            File file = new File(this.pathDataBase+"articles/"+day+"/"+s+".txt");
+            FileWriter fileWriter = new FileWriter(this.pathDataBase+"articles/"+day+"/"+s+".txt");
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write(line);
             bufferedWriter.close();
@@ -191,6 +208,7 @@ class DataSplitImpl extends DataSplit {
         for(int i = 3; i < arg.length; i += 4) {
             flagTaks += ";" + arg[i];
             flagTaks += ";" + arg[i+1];
+            flagTaks += ";" + this.indices.get(arg[i+1]);
             task.put(arg[0]+";"+arg[1]+flagTaks,Double.parseDouble(arg[i]));
             flagTaks = "";
         }
@@ -209,10 +227,12 @@ class DataSplitImpl extends DataSplit {
     }
 
 
-    public Map<String,Double> writePartition(Map<String, Double> tasks, Partition partition) throws IOException {
-        System.out.println("Escrita na partição "+partition.getId());
-        ArrayList<String> taskOut = new ArrayList<String>();
+    public Map<String,Double> writePartition(Map<String, Double> tasks, int part) throws IOException {
+        System.out.println("Escrita na partição "+part+" "+tasks.size());
+        FileWriter fileWriter = new FileWriter(new File(this.pathDataBase+"partition"+part+"/sessions.txt"),true);
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
         while(tasks.size()  > 0){
+            //System.out.println(tasks.size());
             Object object = MapSort.getFirst(tasks);
             String[] key = ((String) object.toString()).split("=");
             String[] arg = key[0].split(";");
@@ -224,16 +244,17 @@ class DataSplitImpl extends DataSplit {
             }
             if(timePublication > 0) {
                 if (!verifyExists(arg[3])) {
-                    partition.setNotification(arg[3], timePublication);
+                    String[] day = this.indices.get(arg[3]).split(";");
+                    bufferedWriter.write(arg[3]+";"+timePublication+";"+day[0]+"\n");
+                    //partition.setNotification(arg[3], timePublication);
                 }
             }
-            taskOut.add(key[0]);
+
+            bufferedWriter.write(key[0]+"\n");
             tasks.remove(key[0]);
         }
-        if(taskOut != null) {
-            System.out.println("Esse é o 0:"+taskOut.size());
-            partition.setSession(taskOut);
-        }
+        System.out.println("Acabou escrita.");
+        bufferedWriter.close();
         return tasks;
     }
 

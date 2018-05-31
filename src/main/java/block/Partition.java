@@ -14,11 +14,11 @@ public class Partition {
     private FileWriter fileWriter;
     private BufferedWriter bufferedWriter;
 
-    public Partition(Integer id){
+    public Partition(Integer id, String path){
         this.id = id;
-        this.session = new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/partition"+id+"/sessions.txt");
+        this.session = new File(path+"partition"+id+"/sessions.txt");
 
-        this.recommendation = new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/partition"+id+"/recommendation.txt");
+        //this.recommendation = new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/partition"+id+"/recommendation.txt");
 
         try {
             this.fileWriter = new FileWriter(this.session,true);
@@ -43,8 +43,10 @@ public class Partition {
 
             //this.bufferedWriter = new BufferedWriter(fileWriter);
 
-            for(int i = 0; i < logs.size(); i++)
-                this.fileWriter.write(logs.get(i)+"\n");
+            for(int i = 0; i < logs.size(); i++) {
+                System.out.println(i+" de "+logs.size());
+                this.fileWriter.write(logs.get(i) + "\n");
+            }
             // bufferedWriter.append(logs+"\n");
             //fileWriter.close();
             //bufferedWriter.close();

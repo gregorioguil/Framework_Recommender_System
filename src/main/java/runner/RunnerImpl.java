@@ -13,21 +13,34 @@ class RunnerImpl extends Runner {
     private ArrayList<Recommend> recommends;
     private int numRecommendation;
     private String lastArticle;
+    private  String pathDataBase;
+    private int numberPartitions;
 
 
-    public RunnerImpl(ArrayList<Recommend> recommends, int numRecommendation){
+    public RunnerImpl(ArrayList<Recommend> recommends, int numRecommendation, String path, int numberPartitions){
         this.recommends = recommends;
         this.numRecommendation = numRecommendation;
-        //this.partition = partition;
+        String[] data = path.split("/");
+        this.pathDataBase = "";
+        for(int i = 0; i < data.length -1; i++)
+            this.pathDataBase += "/"+ data[i];
+        this.pathDataBase += "/DataBase/";
+        this.numberPartitions = numberPartitions;
     }
 
     public void run(){
         Recommend syst = null;
+        int part = 0;
+        File partition = new File(pathDataBase+"partition"+part+"/sessions.txt");
+
         for(int i = 0; i < this.recommends.size(); i++){
             syst = this.recommends.get(i);
-            syst.init(4);
+            syst.init(numRecommendation,partition,pathDataBase);
             //syst.getUserIten();
-            syst.run();
+            for(int j = 1; j < this.numberPartitions ; j ++){
+                syst.run(j);
+            }
+
         }
     }
 
@@ -40,7 +53,7 @@ class RunnerImpl extends Runner {
 
     public void cleanBase(){
         try {
-            FileUtils.deleteDirectory(new File("BaseOfData"));
+            FileUtils.deleteDirectory(new File("DataBase"));
         } catch (IOException e) {
             e.printStackTrace();
         }

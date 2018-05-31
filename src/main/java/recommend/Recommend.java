@@ -1,12 +1,14 @@
 package recommend;
 
+import java.io.File;
+
 public interface Recommend {
 
     // run the system recommendation
-    void run();
+    void run(int numberPartitions);
 
     // initial the historic data
-    void init(int numberOfRecommend);
+    void init(int numberOfRecommend, File partition, String path);
 
     /**
      * Receive news items
