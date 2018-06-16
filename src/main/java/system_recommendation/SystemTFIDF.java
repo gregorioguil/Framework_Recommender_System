@@ -3,8 +3,7 @@ package system_recommendation;
 import java.io.*;
 import java.util.*;
 
-import org.apache.lucene.search.similarities.DFISimilarity;
-import org.apache.lucene.search.similarities.DFRSimilarity;
+
 
 import recommend.Recommend;
 

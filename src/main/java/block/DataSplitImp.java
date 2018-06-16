@@ -4,11 +4,7 @@ import java.io.*;
 
 import java.util.*;
 
-import org.apache.lucene.analysis.tokenattributes.TermFrequencyAttributeImpl;
-import org.apache.lucene.search.similarities.Similarity;
-import org.apache.lucene.search.similarities.TFIDFSimilarity;
 
-import info.debatty.java.stringsimilarity.Jaccard;
 
 
 

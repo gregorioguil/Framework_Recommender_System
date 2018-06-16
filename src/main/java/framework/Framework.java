@@ -2,6 +2,9 @@ package framework;
 
 import block.DataSplitFactory;
 import block.DataSplitFactoryImpl;
+import evaluate.Evaluate;
+import evaluate.EvaluateFactory;
+import evaluate.EvaluateFactoryImpl;
 import evaluate.Metrics;
 import recommend.Recommend;
 import runner.RunnerFactory;
@@ -13,7 +16,9 @@ import java.util.ArrayList;
 public class Framework {
     private static DataSplitFactory dataSplitFactory = null;
     private  static RunnerFactory runnerFactory = null;
+    private static EvaluateFactory evaluateFactory = null;
     private static ArrayList<Recommend> recommends = new ArrayList<Recommend>();
+    private static ArrayList<Metrics> metrics = new ArrayList<Metrics>();
     private static String path = null;
     private static String database = "database.txt";
     private static int numberPartitions;
@@ -71,11 +76,12 @@ public class Framework {
         runnerFactory.run();
     }
 
-    public static void insertMetrics(Metrics metrics){
-
+    public static void insertMetrics(Metrics m){
+        metrics.add(m);
     }
 
     public static void runEvaluator(){
-
+        evaluateFactory = new EvaluateFactoryImpl();
+        evaluateFactory.createEvaluate(path,numberPartitions);
     }
 }
