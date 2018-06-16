@@ -1,4 +1,4 @@
-package main.java.evaluate;
+package evaluate;
 
 import java.io.File;
 import java.io.FileWriter;

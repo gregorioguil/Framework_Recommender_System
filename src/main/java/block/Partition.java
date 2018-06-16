@@ -4,18 +4,30 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Partition {
 
     private Integer id;
     private File session;
     private File recommendation;
+    private FileWriter fileWriter;
+    private BufferedWriter bufferedWriter;
 
-    public Partition(Integer id){
+    public Partition(Integer id, String path){
         this.id = id;
-        this.session = new File("BaseOfData/partition"+id+"/sessions.txt");
+        this.session = new File(path+"partition"+id+"/sessions.txt");
 
-        this.recommendation = new File("BaseOfData/partition"+id+"/recommendation.txt");
+        //this.recommendation = new File("/home/gregorio/Dropbox/Ufop/Monografia 1/DataBase/partition"+id+"/recommendation.txt");
+
+        try {
+            this.fileWriter = new FileWriter(this.session,true);
+            //this.bufferedWriter = new BufferedWriter(fileWriter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
 
@@ -25,21 +37,25 @@ public class Partition {
         return session;
     }
 
-    public void setSession(String logs) {
+    public void setSession(ArrayList<String> logs) throws IOException {
         try {
-            System.out.println(logs);
-            String[] args = logs.split(";");
-            String out = args[0];
-            for(int i = 2; i < args.length; i +=4){
-                out += ";"+ args[i]+";"+args[i+1];
+            //this.fileWriter = new FileWriter(this.session,true);
+
+            //this.bufferedWriter = new BufferedWriter(fileWriter);
+
+            for(int i = 0; i < logs.size(); i++) {
+                System.out.println(i+" de "+logs.size());
+                this.fileWriter.write(logs.get(i) + "\n");
             }
-            FileWriter fileWriter = new FileWriter(this.session,true);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(out+"\n");
             // bufferedWriter.append(logs+"\n");
-            bufferedWriter.close();
+            //fileWriter.close();
+            //bufferedWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
+//        } finally {
+//            if(fileWriter != null){
+//                fileWriter.close();
+//            }
         }
     }
 
@@ -73,6 +89,25 @@ public class Partition {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public void setNotification(String id, Double timePublication){
+
+        try {
+            //this.fileWriter = new FileWriter(this.session,true);
+            this.fileWriter.write(id+";"+timePublication+"\n");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closed() {
+        try {
+            this.fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 //    public void updatePartition(String logs){
