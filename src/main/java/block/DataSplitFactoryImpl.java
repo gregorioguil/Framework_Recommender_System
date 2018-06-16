@@ -9,7 +9,7 @@ public class DataSplitFactoryImpl extends DataSplitFactory{
     }
 
     @Override
-    public void run(Double unitTime, Double initTime) {
+    public void run(Long unitTime, Long initTime) {
         dataSplit.run(unitTime,initTime);
     }
 

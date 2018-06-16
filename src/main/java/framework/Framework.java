@@ -21,20 +21,31 @@ public class Framework {
     public static void insertData(String logs, String data){
         dataSplitFactory = new DataSplitFactoryImpl();
         dataSplitFactory.createDataSplit(logs,data);
-        numberPartitions = dataSplitFactory.getNumberPartitions();
         path = data;
         try {
             FileWriter fileWriter = new FileWriter(new File(database));
-            fileWriter.write(data);
+            fileWriter.write(data+"\n");
+
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void runDataSplit(Double unitTime, Double initTime){
+    public static void runDataSplit(Long unitTime, Long initTime){
 
         dataSplitFactory.run(unitTime,initTime);
+        numberPartitions = dataSplitFactory.getNumberPartitions();
+        try {
+            FileWriter fileWriter = new FileWriter(new File(database),true);
+            fileWriter.write(numberPartitions+"\n");
+            System.out.println("Número de partições "+numberPartitions);
+            System.in.read();
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static void insertRecSys(Recommend sys){
@@ -48,6 +59,7 @@ public class Framework {
                 FileReader fileReader = new FileReader(new File(database));
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
                 path = bufferedReader.readLine();
+                numberPartitions = Integer.parseInt(bufferedReader.readLine());
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
