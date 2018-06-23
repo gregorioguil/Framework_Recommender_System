@@ -22,5 +22,7 @@ public interface Recommend {
 
 
     void getNews(String article);
+    
+    void clean();
 
 }

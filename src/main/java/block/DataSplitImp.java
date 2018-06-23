@@ -21,6 +21,7 @@ class DataSplitImpl extends DataSplit {
     static  String pathDataBase;
     private TreeMap<Integer, Integer> indices;
     private int numberPartitions;
+    private HashMap<Integer,Set<Integer>> sessions;
 
     public DataSplitImpl( String logs, String data){
         this.data = new File(data);
@@ -51,6 +52,8 @@ class DataSplitImpl extends DataSplit {
         FileReader fileReaderData;
         BufferedReader bufferedReaderLogs;
         BufferedReader bufferedReaderData;
+
+
         int part = 0;
         Map<String, Long> task = new HashMap<String, Long>();
         try {
@@ -59,9 +62,11 @@ class DataSplitImpl extends DataSplit {
             if (new File(this.pathDataBase + "partition" + part).mkdirs())
                 System.out.println("Created dir DataBase/partition" + part);
             //Partition partition = new Partition(part,this.pathDataBase);
-            FileWriter fileWriter = new FileWriter(new File(this.pathDataBase+"partition"+part+"/sessions.txt"),true);
+            FileWriter fileWriter = new FileWriter(new File(this.pathDataBase+"partition"+part+"/tasks.txt"),true);
             //BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            FileWriter fileWriterTemplat = new FileWriter(new File(this.pathDataBase+"template"+part+".txt"));
             PrintWriter printWriter = new PrintWriter(fileWriter);
+            PrintWriter printWriter1 = new PrintWriter(fileWriterTemplat);
             fileReaderLogs = new FileReader(this.logs);
             fileReaderData = new FileReader(this.data);
             bufferedReaderData = new BufferedReader(fileReaderData);
@@ -93,6 +98,8 @@ class DataSplitImpl extends DataSplit {
 	            	String[] arg = lineLogs.split(";");
 	            	Long timeStamp = Long.parseLong(arg[3]);
 	                task = mountTask(arg, task);
+	                if(part > 0)
+                        montSession(arg,printWriter1);
 	                System.out.println(timeStamp+" "+this.getCurrentTime());
 	                if(timeStamp >= this.getCurrentTime()) {
 	                	//System.in.read();
@@ -121,7 +128,7 @@ class DataSplitImpl extends DataSplit {
 	            if (new File(pathDataBase + "partition" + part).mkdirs())
 	                System.out.println("Created dir DataBase/partition" + part);
 	            printWriter.close();
-	            fileWriter = new FileWriter(new File(this.pathDataBase+"partition"+part+"/sessions.txt"),true);
+	            fileWriter = new FileWriter(new File(this.pathDataBase+"partition"+part+"/tasks.txt"),true);
 	            //bufferedWriter = new BufferedWriter(fileWriter);
 	            printWriter = new PrintWriter(fileWriter);
 	                
@@ -138,7 +145,7 @@ class DataSplitImpl extends DataSplit {
         }
     }
 
-    private Long getTimePublicationArticle(Integer s) {
+    private Long getTimePublicationArticle(Long s) {
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
         Integer day  = this.indices.get(s);
@@ -243,24 +250,39 @@ class DataSplitImpl extends DataSplit {
             flagTaks += ";" + arg[i];
             flagTaks += ";" + arg[i+1];
             flagTaks += ";" + this.indices.get(Integer.parseInt(arg[i+1]));
-            getTimePublicationArticle(Integer.parseInt(arg[i+1]));
+            getTimePublicationArticle(Long.parseLong(arg[i+1]));
             task.put(arg[0]+";"+arg[1]+flagTaks,Long.parseLong(arg[i]));
             flagTaks = "";
         }
         return task;
     }
 
-    public static ArrayList<File>    mountPartirion(Long unitTime){
-        ArrayList<File> partitions = new ArrayList<File>();
-        return partitions;
-    }
 
-    private static Long getTimeTask(Object object){
-        String[] key = ((String) object.toString()).split("=");
-        String[] id = key[0].split(";");
-        return Long.parseLong(id[2]);
-    }
+    public void montSession(String[] arg, PrintWriter fileWriter){
 
+        List<Long> list = new ArrayList<Long>();
+
+        String out = arg[1];
+        for(int i = 4; i < arg.length; i += 4){
+            Long idAux = Long.parseLong(arg[i]);
+            Long time = getTimePublicationArticle(idAux);
+            if(time == null){
+                list.add((long) -1);
+            }else{
+                if(list.contains(idAux)){
+                    if(!list.get(list.size()-2).equals(idAux))
+                        list.add(idAux);
+                }else{
+                    list.add(idAux);
+                }
+            }
+
+        }
+
+        fileWriter.write(out+";"+list+"\n");
+        //fileWriter.close();
+
+    }
 
     public Map<String,Long> writePartition(Map<String, Long> task, int part, PrintWriter bufferedWriter) throws IOException {
         System.out.println("Escrita na partição "+part+" "+task.size());
@@ -284,10 +306,11 @@ class DataSplitImpl extends DataSplit {
 
             Long timePublication;
             String line = null;
-            Integer idArticle;
+            Long idArticle;
             Long timeStamp;
             if(key.length > 3) {
-                idArticle = Integer.parseInt(key[3]);
+            	
+                idArticle = Long.parseLong(key[3]);
                 timeStamp = Long.parseLong(key[2]);
                 timePublication = getTimePublicationArticle(idArticle);
                 if(timePublication == null) {
@@ -303,7 +326,7 @@ class DataSplitImpl extends DataSplit {
                 }
             }else {
                 timePublication = Long.parseLong(key[1]);
-                idArticle = Integer.parseInt(key[0]);
+                idArticle = Long.parseLong(key[0]);
                 Integer day = this.indices.get(idArticle);
                 if(day == null) {
                 	System.out.println(idArticle+";"+timePublication+";"+day+";"+true);

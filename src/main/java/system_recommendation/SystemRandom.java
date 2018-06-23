@@ -16,7 +16,7 @@ public class SystemRandom implements Recommend {
 
     public List<String> run(String line) {
         List<String> recommends = new ArrayList<String>();
-        //System.out.println("Sistema de Recomendação Randômico.");
+        System.out.println("Sistema de Recomendação Randômico.");
 
         String[] arg = line.split(";");
         if(arg.length < 5) {
@@ -161,6 +161,14 @@ public class SystemRandom implements Recommend {
     public void getNews(String article) {
 
     }
+
+
+
+	@Override
+	public void clean() {
+		this.article = null;
+		
+	}
 
 
 }

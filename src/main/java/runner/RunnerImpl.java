@@ -1,19 +1,22 @@
 package runner;
 
 
-import org.apache.commons.io.FileUtils;
-import recommend.Recommend;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+
+import org.apache.commons.io.FileUtils;
+
+import recommend.Recommend;
 
 class RunnerImpl extends Runner {
 
     private ArrayList<Recommend> recommends;
     private int numRecommendation;
-    private String lastArticle;
     private  String pathDataBase;
     private int numberPartitions;
 
@@ -32,7 +35,7 @@ class RunnerImpl extends Runner {
     public void run(){
         Recommend syst = null;
         int part = 0;
-        File partition = new File(pathDataBase+"partition"+part+"/sessions.txt");
+        File partition = new File(pathDataBase+"partition"+part+"/tasks.txt");
         int cont = 0;
         for(int i = 0; i < this.recommends.size(); i++){
 
@@ -40,51 +43,66 @@ class RunnerImpl extends Runner {
             syst.init(numRecommendation,partition,pathDataBase);
             //syst.getUserIten();
             System.out.println("Número de partições: "+this.numberPartitions);
-            for(int j = 1; j < this.numberPartitions ; j ++){
-            	partition = new File(pathDataBase+"partition"+1+"/sessions.txt");
-                new File(pathDataBase+"systens/"+"system"+i+"/").mkdirs();
-                System.out.println("Partição "+j);
-                //File partition = new File(path+"partition"+numberPartitions+"/"+"sessions.txt");
-                File recommend = new File(pathDataBase+"systens/"+"system"+i+"/recommends"+j+".txt");
-                FileWriter fileWriter;
-                FileReader fileReader;
-                BufferedReader bufferedReader;
+            new File(pathDataBase+"systens/"+"system"+i+"/").mkdirs();
+            File recommend = new File(pathDataBase+"systens/"+"system"+i+"/recommends.txt");
+            FileWriter fileWriter = null;
+            try {
+                fileWriter = new FileWriter(recommend);
 
-                try {
+                for(int j = 1; j < this.numberPartitions ; j ++){
+                    partition = new File(pathDataBase+"partition"+j+"/tasks.txt");
+
+                    //System.out.println("Partição "+j);
+                    //File partition = new File(path+"partition"+numberPartitions+"/"+"sessions.txt");
+
+
+                    FileReader fileReader;
+                    BufferedReader bufferedReader;
+
+
                     fileReader = new FileReader(partition);
                     bufferedReader = new BufferedReader(fileReader);
                     String line = bufferedReader.readLine();
-                    fileWriter = new FileWriter(recommend);
                     
+
                     while(line != null) {
-                    	String[] args = line.split(";");
-                    	
-                    	if(args.length < 4) {
-                    		//System.out.println("Não existe na base.");
-                    		line = bufferedReader.readLine();
-                    		continue;
-                    	}
-                    	int idSession = Integer.parseInt(args[1]);
-                    	long init_time = System.currentTimeMillis();
+                        String[] args = line.split(";");
+
+                        if (args.length < 4) {
+                            //System.out.println("Não existe na base.");
+                            line = bufferedReader.readLine();
+                            continue;
+                        }
+                        Long idSession = Long.parseLong(args[1]);
+                        Long idArticle = Long.parseLong(args[2]);
+
+
+                        long init_time = System.currentTimeMillis();
                         List<String> output = syst.run(line);
                         long end_time = System.currentTimeMillis();
                         end_time = end_time - init_time;
                         line = bufferedReader.readLine();
-                        System.out.println(cont++);
+//                        for(int k = 0; k < output.size(); k++)
+//                        	System.out.println(k+" "+output.get(k));
                         //System.in.read();
-                        fileWriter.write(idSession+";"+output+";"+end_time+"\n");
+                        fileWriter.write(idSession + ";" + output + ";" + end_time + "\n");
+//                        if(idSession == 1422){
+//                            System.out.println(idSession + ";"+idArticle+";"+ output + ";" + end_time);
+//                            System.in.read();
+//                        }
                     }
-                    fileWriter.close();
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    bufferedReader.close();
+                    
                 }
 
+            
+            fileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-        }
+            syst.clean();
+            syst = null;
+       }
     }
 
     public void definedBase(double initTime, double unitTime, File logs, File data) throws IOException {

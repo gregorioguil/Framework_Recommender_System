@@ -2,10 +2,9 @@ package framework;
 
 import block.DataSplitFactory;
 import block.DataSplitFactoryImpl;
-import evaluate.Evaluate;
 import evaluate.EvaluateFactory;
 import evaluate.EvaluateFactoryImpl;
-import evaluate.Metrics;
+import metrics.Metrics;
 import recommend.Recommend;
 import runner.RunnerFactory;
 import runner.RunnerFactoryImpl;
@@ -20,6 +19,7 @@ public class Framework {
     private static ArrayList<Recommend> recommends = new ArrayList<Recommend>();
     private static ArrayList<Metrics> metrics = new ArrayList<Metrics>();
     private static String path = null;
+    private static String pathLog = null;
     private static String database = "database.txt";
     private static int numberPartitions;
 
@@ -27,10 +27,11 @@ public class Framework {
         dataSplitFactory = new DataSplitFactoryImpl();
         dataSplitFactory.createDataSplit(logs,data);
         path = data;
+        pathLog = logs;
         try {
             FileWriter fileWriter = new FileWriter(new File(database));
             fileWriter.write(data+"\n");
-
+            fileWriter.write(logs+"\n");
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -45,7 +46,7 @@ public class Framework {
             FileWriter fileWriter = new FileWriter(new File(database),true);
             fileWriter.write(numberPartitions+"\n");
             System.out.println("Número de partições "+numberPartitions);
-            System.in.read();
+            //System.in.read();
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -64,6 +65,7 @@ public class Framework {
                 FileReader fileReader = new FileReader(new File(database));
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
                 path = bufferedReader.readLine();
+                pathLog = bufferedReader.readLine();
                 numberPartitions = Integer.parseInt(bufferedReader.readLine());
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -82,6 +84,7 @@ public class Framework {
 
     public static void runEvaluator(){
         evaluateFactory = new EvaluateFactoryImpl();
-        evaluateFactory.createEvaluate(path,numberPartitions);
+        evaluateFactory.createEvaluate(metrics,path,pathLog,recommends.size(),numberPartitions);
+        evaluateFactory.run();
     }
 }

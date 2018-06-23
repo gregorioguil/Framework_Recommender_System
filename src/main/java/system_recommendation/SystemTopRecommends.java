@@ -151,4 +151,11 @@ public class SystemTopRecommends implements Recommend {
     public void getNews(String article) {
 
     }
+
+	@Override
+	public void clean() {
+		this.acess = null;
+		this.article = null;
+		this.aux = null;
+	}
 }
