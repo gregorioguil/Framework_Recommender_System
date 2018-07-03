@@ -22,7 +22,10 @@ public interface Recommend {
 
 
     void getNews(String article);
-    
+
+    /**
+     * clean everything
+     */
     void clean();
 
 }

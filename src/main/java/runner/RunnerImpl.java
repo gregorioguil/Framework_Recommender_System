@@ -49,9 +49,9 @@ class RunnerImpl extends Runner {
             try {
                 fileWriter = new FileWriter(recommend);
 
-                for(int j = 1; j < this.numberPartitions ; j ++){
+                for(int j = 1; j <= this.numberPartitions ; j ++){
                     partition = new File(pathDataBase+"partition"+j+"/tasks.txt");
-
+                    System.out.println("Parition "+j);
                     //System.out.println("Partição "+j);
                     //File partition = new File(path+"partition"+numberPartitions+"/"+"sessions.txt");
 
@@ -64,10 +64,11 @@ class RunnerImpl extends Runner {
                     bufferedReader = new BufferedReader(fileReader);
                     String line = bufferedReader.readLine();
                     
-
+                    //int cont2 = 0;
                     while(line != null) {
                         String[] args = line.split(";");
-
+                        //cont2 ++;
+                        //System.out.println(cont2);
                         if (args.length < 4) {
                             //System.out.println("Não existe na base.");
                             line = bufferedReader.readLine();
@@ -78,10 +79,12 @@ class RunnerImpl extends Runner {
 
 
                         long init_time = System.currentTimeMillis();
+
                         List<String> output = syst.run(line);
                         long end_time = System.currentTimeMillis();
                         end_time = end_time - init_time;
                         line = bufferedReader.readLine();
+                        //System.out.println(output);
 //                        for(int k = 0; k < output.size(); k++)
 //                        	System.out.println(k+" "+output.get(k));
                         //System.in.read();

@@ -83,6 +83,19 @@ public class Framework {
     }
 
     public static void runEvaluator(){
+        if(path == null){
+            try {
+                FileReader fileReader = new FileReader(new File(database));
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                path = bufferedReader.readLine();
+                pathLog = bufferedReader.readLine();
+                numberPartitions = Integer.parseInt(bufferedReader.readLine());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         evaluateFactory = new EvaluateFactoryImpl();
         evaluateFactory.createEvaluate(metrics,path,pathLog,recommends.size(),numberPartitions);
         evaluateFactory.run();
