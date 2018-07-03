@@ -4,11 +4,7 @@ import java.io.*;
 
 import java.util.*;
 
-import org.apache.lucene.analysis.tokenattributes.TermFrequencyAttributeImpl;
-import org.apache.lucene.search.similarities.Similarity;
-import org.apache.lucene.search.similarities.TFIDFSimilarity;
 
-import info.debatty.java.stringsimilarity.Jaccard;
 
 
 
@@ -23,15 +19,16 @@ class DataSplitImpl extends DataSplit {
     private String lastArticle;
     private Long secondsDay;
     static  String pathDataBase;
-    private TreeMap<Integer, Integer> indices;
+    private TreeMap<Long, Integer> indices;
     private int numberPartitions;
+    private HashMap<Integer,Set<Integer>> sessions;
 
     public DataSplitImpl( String logs, String data){
         this.data = new File(data);
 
         this.logs = new File(logs);
         this.secondsDay = Long.valueOf(0);
-        this.indices = new TreeMap<Integer, Integer>();
+        this.indices = new TreeMap<Long, Integer>();
         String[] path = data.split("/");
         this.pathDataBase = "";
         for(int i = 0; i < path.length -1; i++)
@@ -55,17 +52,24 @@ class DataSplitImpl extends DataSplit {
         FileReader fileReaderData;
         BufferedReader bufferedReaderLogs;
         BufferedReader bufferedReaderData;
-        int part = 0;
+
+
+        int part = 0, part2 = 1;
         Map<String, Long> task = new HashMap<String, Long>();
         try {
 
-
+            if (new File(this.pathDataBase+"templates").mkdirs())
+                System.out.println("Created dir DataBase/templates/");
             if (new File(this.pathDataBase + "partition" + part).mkdirs())
-                System.out.println("Created dir DataBase/partition" + part);
+                System.out.println("Created dir DataBase/partition/" + part);
             //Partition partition = new Partition(part,this.pathDataBase);
-            FileWriter fileWriter = new FileWriter(new File(this.pathDataBase+"partition"+part+"/sessions.txt"),true);
+            FileWriter fileWriter = new FileWriter(new File(this.pathDataBase+"partition"+part+"/tasks.txt"),true);
             //BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             PrintWriter printWriter = new PrintWriter(fileWriter);
+            FileWriter fileWriterTemplate;
+            PrintWriter printWriter1 = null;
+
+
             fileReaderLogs = new FileReader(this.logs);
             fileReaderData = new FileReader(this.data);
             bufferedReaderData = new BufferedReader(fileReaderData);
@@ -81,12 +85,13 @@ class DataSplitImpl extends DataSplit {
 	            	String[] arg2 = lineData.split(";");
 	            	Long timePublication = Long.parseLong(arg2[2]);
 	            	task.put(arg2[0]+";"+arg2[2], timePublication);
-	                System.out.println(timePublication+" "+this.getCurrentTime());
+	                //System.out.println(timePublication+" "+this.getCurrentTime());
+	                //System.out.println(lineData);
 	                if(timePublication >= this.getCurrentTime()) {
 	                	//System.in.read();
 	                	break;
 	                }
-	                
+
 	            }
 	            
 	            String lineLogs;
@@ -97,7 +102,9 @@ class DataSplitImpl extends DataSplit {
 	            	String[] arg = lineLogs.split(";");
 	            	Long timeStamp = Long.parseLong(arg[3]);
 	                task = mountTask(arg, task);
-	                System.out.println(timeStamp+" "+this.getCurrentTime());
+	                if(part > 0)
+                        montSession(arg,printWriter1);
+	                //System.out.println(timeStamp+" "+this.getCurrentTime());
 	                if(timeStamp >= this.getCurrentTime()) {
 	                	//System.in.read();
 	                	break;
@@ -109,14 +116,14 @@ class DataSplitImpl extends DataSplit {
 	            	writePartition(task, part, printWriter);
 	                break;
 	            }
-	            System.out.println(cont);
+	            //System.out.println(cont);
 	            cont++;
 	
 	         
 	            task = MapSort.sortByValue(task);
-	            System.out.println("Ordenado!");
+	            //System.out.println("Ordenado!");
 	            task = writePartition(task, part, printWriter);
-	            System.out.println("Escrito! "+task.size());
+	            //System.out.println("Escrito! "+task.size());
 	            //task.clear();
 	            
 	            this.setCurrentTime();
@@ -125,15 +132,18 @@ class DataSplitImpl extends DataSplit {
 	            if (new File(pathDataBase + "partition" + part).mkdirs())
 	                System.out.println("Created dir DataBase/partition" + part);
 	            printWriter.close();
-	            fileWriter = new FileWriter(new File(this.pathDataBase+"partition"+part+"/sessions.txt"),true);
+	            fileWriter = new FileWriter(new File(this.pathDataBase+"partition"+part+"/tasks.txt"),true);
 	            //bufferedWriter = new BufferedWriter(fileWriter);
 	            printWriter = new PrintWriter(fileWriter);
-	                
+	            if(printWriter1 != null)
+	                printWriter1.close();
+                fileWriterTemplate = new FileWriter(new File(this.pathDataBase + "templates/template" + part + ".txt"));
+                printWriter1 = new PrintWriter(fileWriterTemplate);
 	
 	            //task = mountTask(arg, task);
 	                //task = MapSort.sortByValue(task);
          	}
-
+            printWriter1.close();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -142,7 +152,7 @@ class DataSplitImpl extends DataSplit {
         }
     }
 
-    private Long getTimePublicationArticle(Integer s) {
+    private Long getTimePublicationArticle(Long s) {
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
         Integer day  = this.indices.get(s);
@@ -166,11 +176,11 @@ class DataSplitImpl extends DataSplit {
         return timePublication;
     }
 
-    public TreeMap<Integer, Integer> getIndices() {
+    public TreeMap<Long, Integer> getIndices() {
         return indices;
     }
 
-    public void setIndices(TreeMap<Integer, Integer> indices) {
+    public void setIndices(TreeMap<Long, Integer> indices) {
         this.indices = indices;
     }
 
@@ -201,7 +211,7 @@ class DataSplitImpl extends DataSplit {
                     this.setSecondsDay();
                 }
                 writeArticleFile(arg[0], line, day);
-                this.indices.put(Integer.parseInt(arg[0]), day);
+                this.indices.put(Long.parseLong(arg[0]), day);
 
                 //System.out.println(this.getCurrentTime()+" "+Long.parseDouble(arg[2]));
                 //dataBase.insertArticle(line);
@@ -246,25 +256,39 @@ class DataSplitImpl extends DataSplit {
         for(int i = 3; i < arg.length; i += 4) {
             flagTaks += ";" + arg[i];
             flagTaks += ";" + arg[i+1];
-            flagTaks += ";" + this.indices.get(Integer.parseInt(arg[i+1]));
-            getTimePublicationArticle(Integer.parseInt(arg[i+1]));
+            flagTaks += ";" + this.indices.get(Long.parseLong(arg[i+1]));
+            getTimePublicationArticle(Long.parseLong(arg[i+1]));
             task.put(arg[0]+";"+arg[1]+flagTaks,Long.parseLong(arg[i]));
             flagTaks = "";
         }
         return task;
     }
 
-    public static ArrayList<File>    mountPartirion(Long unitTime){
-        ArrayList<File> partitions = new ArrayList<File>();
-        return partitions;
-    }
 
-    private static Long getTimeTask(Object object){
-        String[] key = ((String) object.toString()).split("=");
-        String[] id = key[0].split(";");
-        return Long.parseLong(id[2]);
-    }
+    public void montSession(String[] arg, PrintWriter fileWriter){
 
+        List<Long> list = new ArrayList<Long>();
+
+        String out = arg[1];
+        for(int i = 4; i < arg.length; i += 4){
+            //System.out.println(arg[0]);
+            Long idAux = Long.parseLong(arg[i]);
+            Long time = getTimePublicationArticle(idAux);
+            //System.out.println(idAux);
+            if(time == null){
+                list.add((long) -1);
+            }else{
+
+                list.add(idAux);
+
+            }
+
+        }
+
+        fileWriter.write(out+";"+list+"\n");
+        //fileWriter.close();
+
+    }
 
     public Map<String,Long> writePartition(Map<String, Long> task, int part, PrintWriter bufferedWriter) throws IOException {
         System.out.println("Escrita na partição "+part+" "+task.size());
@@ -278,7 +302,7 @@ class DataSplitImpl extends DataSplit {
 //        System.in.read();
         
         while(iterator.hasNext()){
-            System.out.println("write "+cont);
+            //System.out.println("write "+cont);
             cont++;
             String id = iterator.next();
             array.add(id);
@@ -288,10 +312,11 @@ class DataSplitImpl extends DataSplit {
 
             Long timePublication;
             String line = null;
-            Integer idArticle;
+            Long idArticle;
             Long timeStamp;
             if(key.length > 3) {
-                idArticle = Integer.parseInt(key[3]);
+            	
+                idArticle = Long.parseLong(key[3]);
                 timeStamp = Long.parseLong(key[2]);
                 timePublication = getTimePublicationArticle(idArticle);
                 if(timePublication == null) {
@@ -307,12 +332,12 @@ class DataSplitImpl extends DataSplit {
                 }
             }else {
                 timePublication = Long.parseLong(key[1]);
-                idArticle = Integer.parseInt(key[0]);
+                idArticle = Long.parseLong(key[0]);
                 Integer day = this.indices.get(idArticle);
-                if(day == null) {
-                	System.out.println(idArticle+";"+timePublication+";"+day+";"+true);
-                	System.in.read();
-                }
+//                if(day == null) {
+//                	System.out.println(idArticle+";"+timePublication+";"+day+";"+true);
+//                	System.in.read();
+//                }
                 line = idArticle+";"+timePublication+";"+day+";"+true;
             }
             bufferedWriter.println(line);
@@ -320,12 +345,12 @@ class DataSplitImpl extends DataSplit {
         }
         
         for(int i = 0; i < array.size(); i ++) {
-        	System.out.println(array.get(i));
+        	//System.out.println(array.get(i));
         	task.remove(array.get(i));
         }
         //System.in.read();
         bufferedWriter.close();
-        System.out.println("Acabou escrita.");
+        //System.out.println("Acabou escrita.");
         //bufferedWriter.close();
         return task;
     }

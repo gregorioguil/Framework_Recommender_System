@@ -26,4 +26,10 @@ public class TestRec implements Recommend {
     public void getNews(String article) {
 
     }
+
+	@Override
+	public void clean() {
+		// TODO Auto-generated method stub
+		
+	}
 }

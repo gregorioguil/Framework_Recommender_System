@@ -163,4 +163,12 @@ public class SystemRandom implements Recommend {
     }
 
 
+
+	@Override
+	public void clean() {
+		this.article = null;
+		
+	}
+
+
 }
