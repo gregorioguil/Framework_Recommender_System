@@ -111,7 +111,7 @@ public class SimilarUser implements Recommend {
 		while(it.hasNext()){
 			Long v = it.next();
 			recommendAux.put(v,recommend.get(v));
-			if(recommendAux.size() == 100)
+			if(recommendAux.size() == 1000)
 				break;
 		}
 
@@ -207,6 +207,8 @@ public class SimilarUser implements Recommend {
 
     @Override
     public void clean() {
-
+        this.users = null;
+        this.similaritys =null;
+        this.article = null;
     }
 }
