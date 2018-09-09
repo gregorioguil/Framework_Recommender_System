@@ -403,7 +403,13 @@ public class SystemTFIDF implements Recommend {
 	@Override
 	public void clean() {
 		// TODO Auto-generated method stub
-		
+		this.termFrequency = null;
+		this.tf = null;
+		this.idf = null;
+		this.users = null;
+		this.tf_idf = null;
+		this.similaritys = null;
+		this.article = null;
 	}
 
 }
