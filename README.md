@@ -3,7 +3,9 @@
 Framework para análise e avaliação de sistemas de recomendação 
 de jornais online. Este trabalho tem como objetivo a criação de um framework para teste e avaliação de sistemas de recomendação de jornal online. A ferramenta recebe os dados e trata para entrada nos algoritmos de recomendação, estes algoritmos
 retornam uma lista de recomendação a qual é avalida pelas 
-métricas que o proprio usuário pode implementar.
+métricas que o proprio usuário pode implementar. As informações 
+contidas abaixo podem ser vistas mais afundo no arquivo `Monografia.pdf`,
+que se encontra neste repositório.
 
 
 A criação deste framework focou em deixar o mesmo o mais fácil 
