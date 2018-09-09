@@ -38,7 +38,7 @@ O algoritmo acima é um exemplo de implementação da classe
 a inicialização dos dados, a inserção de sistemas de recomendação 
 e métricas.
 
-###Módulo  Tratamento dos Dados (DataSplit)
+### Módulo  Tratamento dos Dados (DataSplit)
 
 Inicialmente a base é composta por 2 arquivos no formato csv. 
 Um contendo informações sobre os  artigos e outro com 
@@ -69,3 +69,46 @@ class Main {
 
 ### Módulo de Recomendação (Runner)
 
+O módulo  `Runner` é responsável por executar os algoritmos de 
+recomendação. Este é também um objeto interno, que é construído 
+usando dos padrões de projeto `Factory` e `Singleton`. Ele deve 
+ser executado posterior ao módulo `DataSplit`, garantindo a 
+existência do conjunto de dados e partições para iniciar a 
+simulação. Para inserir um algoritmo de recomendação é usado o 
+método `Framework.insertRecSys(Recommed Obj)`. Como argumento 
+esse método recebe um objeto que implementa uma interface 
+`Recommend` do framework.
+
+```java
+public interface Recommend {
+    /**
+     * Receive news items
+     * @param task it is a line of partition in the <id_user,id_session,timeStamp,id_article>.
+     */
+    List<String> run(String task);
+
+    /**
+     * initial the historic data
+     * @param numberOfRecommend it  a number of partitions
+     * @param partition it a file of partition
+     */
+    void init(int numberOfRecommend, File partition, String path);
+
+    /**
+     * clean everything
+     */
+    void clean();
+
+}
+```
+
+
+### Módulo de Avaliação (Evaluate)
+
+É o módulo dedicado às métricas de avaliação. Onde, o módulo de 
+recomendação faz uma predição usando algum algoritmo de 
+recomendação e essa predição é avaliada de acordo com as 
+métricas.
+
+Para a execução desse módulo é necessário a implementação da 
+classe `Metrics`.
